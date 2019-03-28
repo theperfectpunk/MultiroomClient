@@ -6,17 +6,87 @@ const fetch = require('node-fetch');
 router.post('/play', function(req, res, next) {
   //debugger;
   console.log(req.body.timestamp - new Date().getTime())
-  setTimeout(() => {
+  fetch('http://127.0.0.1:8080/jsonrpc', {
+    method: "POST",
+    headers: {"Content-Type": "application/json"},
+    body: JSON.stringify({
+      "jsonrpc": "2.0",
+      "method": "Application.SetMute",
+      "params": {
+        "mute": false
+      },
+      "id": 0
+    })
+  })
+  .then(() => {
     fetch('http://127.0.0.1:8080/jsonrpc', {
       method: "POST",
       headers: {"Content-Type": "application/json"},
       body: JSON.stringify(req.body.payload)
     })
     .then((response) => {
-      //debugger;
-      res.send({message: "success"});
+      console.log(response)
+      fetch('http://127.0.0.1:8080/jsonrpc', {
+        method: "POST",
+        headers: {"Content-Type": "application/json"},
+        body: JSON.stringify({
+          "jsonrpc": "2.0",
+          "method": "Player.PlayPause",
+          "params": {
+            "playerid": 0,
+            "play": false
+          },
+          "id": 0
+        })
+      })
+      .then((response) => {
+        console.log(response)
+        fetch('http://127.0.0.1:8080/jsonrpc', {
+          method: "POST",
+          headers: {"Content-Type": "application/json"},
+          body: JSON.stringify({
+            "jsonrpc": "2.0",
+            "method": "Application.SetMute",
+            "params": {
+              "mute": false
+            },
+            "id": 0
+          })
+        })
+        .then((response) => {
+          console.log(response)
+          setTimeout( () => {
+            fetch('http://127.0.0.1:8080/jsonrpc', {
+              method: "POST",
+              header: {"Content-Type": "application/json"},
+              body: JSON.stringify({
+                "jsonrpc": "2.0",
+                "method": "Player.Seek",
+                "params": {
+                  "playerid": 0,
+                  "value": {
+                    "time": {
+                      "hours": 0,
+                      "milliseconds": 0,
+                      "minutes": 0,
+                      "seconds": 0
+                    }
+                  }
+                },
+                "id": 0
+              })
+            })
+            .then(() => {
+              res.send({
+                message: "success"
+              })
+            })
+          }, req.body.timestamp - new Date().getTime())
+        })
+      })
     })
-  }, req.body.timestamp - new Date().getTime())
+  })
+  
 });
 
 module.exports = router;
