@@ -35,4 +35,18 @@ router.post('/seek', function(req, res, next) {
     })
 });
 
+/* Get current seek position. */
+router.get('/position', function(req, res, next) {
+  var currentTimeStamp = new Date().getTime();
+  fetch('http://127.0.0.1:8080/jsonrpc', {
+    method: "POST",
+    headers: {"Content-Type": "application/json"},
+    body: JSON.stringify({"jsonrpc":"2.0","method":"Player.GetProperties","params":{"playerid":0,"properties":["time"]},"id":0})
+  })
+  .then((response) => {
+    var seekTime = response.result.time;
+    res.send({timestamp: currentTimeStamp, seekTime: seekTime})
+  })
+})
+
 module.exports = router;
