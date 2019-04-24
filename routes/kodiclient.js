@@ -49,4 +49,21 @@ router.get('/position', function(req, res, next) {
   })
 })
 
+/* Play/Pause player */
+router.post('/playpause', function(req, res, next) {
+  
+  var timeOffset = req.body.timestamp - new Date().getTime();
+
+  setTimeout( () => {
+    fetch('http://127.0.0.1:8080/jsonrpc', {
+      method: "POST",
+      headers: {"Content-Type": "application/json"},
+      body: JSON.stringify({"jsonrpc":"2.0","method":"Player.PlayPause","params":{"playerid":0},"id":0})
+    })
+    .then((response) => {
+      res.send({"message": "success"})
+    })}, timeOffset
+  );
+})
+
 module.exports = router;
