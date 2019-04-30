@@ -20,6 +20,40 @@ router.post('/play', function(req, res, next) {
   }, req.body.timestamp - new Date().getTime())
 });
 
+/* Play next song after delay. */
+router.post('/next', function(req, res, next) {
+  var currentPosition = req.body.position;
+  setTimeout(() => {
+    fetch('http://127.0.0.1:8080/jsonrpc', {
+      method: "POST",
+      headers: {"Content-Type": "application/json"},
+      body: JSON.stringify({"jsonrpc":"2.0","method":"Player.Open","params":{"item":{"position":currentPosition+1,"playlistid":0}},"id":0})
+    })
+    .then(
+      response => {
+        res.status(200).send({"message": "success"})
+      }
+    )
+  }, req.body.timestamp - new Date().getTime());
+})
+
+/* Play previous song after delay. */
+router.post('/prev', function(req, res, next) {
+  var currentPosition = req.body.position;
+  setTimeout(() => {
+    fetch('http://127.0.0.1:8080/jsonrpc', {
+      method: "POST",
+      headers: {"Content-Type": "application/json"},
+      body: JSON.stringify({"jsonrpc":"2.0","method":"Player.Open","params":{"item":{"position":currentPosition-1,"playlistid":0}},"id":0})
+    })
+    .then(
+      response => {
+        res.status(200).send({"message": "success"})
+      }
+    )
+  }, req.body.timestamp - new Date().getTime());
+})
+
 /* Seek currently playing song after delay. */
 router.post('/seek', function(req, res, next) {
   var seekOffset = new Date().getTime() - req.body.timestamp;
